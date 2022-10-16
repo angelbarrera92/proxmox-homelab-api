@@ -1,0 +1,86 @@
+---
+host: 0.0.0.0
+port: 8080
+log_level: info
+
+proxmox_nodes:
+  - name: nuc1
+    description: "nuc1"
+    ip: 192.168.2.1
+    mac: XX:YY:ZZ:06:19:0F
+    wol:
+      broadcast: 192.168.255.255:9
+    proxmox:
+      schema: https
+      verifySSL: false
+      port: 8006
+      username: root
+      password: root
+    probes:
+    - type: port
+      port: 22
+    - type: port
+      port: 8006
+    - type: http
+      port: 8006
+      schema: https
+      path: /
+      expected_status: 200
+  - name: nuc2
+    description: "nuc2"
+    ip: 192.168.2.2
+    mac: ZZ:FF:GG:06:19:0F
+    wol:
+      broadcast: 192.168.255.255:9
+    proxmox:
+      schema: https
+      verifySSL: false
+      port: 8006
+      username: root
+      password: root
+    ssh:
+      port: 22
+      username: root
+      password: root
+    probes:
+    - type: port
+      port: 22
+    - type: port
+      port: 8006
+    - type: http
+      port: 8006
+      schema: https
+      path: /
+      expected_status: 200
+
+expected_services:
+  - name: hello
+    proxmox_node: nuc1
+    ip: 192.168.3.1
+    port: 80
+    schema: http
+    probes:
+    - type: port
+      port: 22
+    - type: port
+      port: 80
+    - type: http
+      port: 80
+      schema: http
+      path: /status.php
+      expected_status: 200
+  - name: world
+    proxmox_node: nuc2
+    ip: 192.168.3.2
+    port: 80
+    schema: http
+    probes:
+    - type: port
+      port: 22
+    - type: port
+      port: 80
+    - type: http
+      schema: http
+      port: 80
+      path: /
+      expected_status: 200
