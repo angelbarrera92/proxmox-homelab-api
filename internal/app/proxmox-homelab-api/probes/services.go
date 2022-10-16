@@ -1,0 +1,44 @@
+package probes
+
+import (
+	"time"
+
+	"github.com/angelbarrera92/proxmox-homelab-api/internal/app/proxmox-homelab-api/config"
+	"github.com/angelbarrera92/proxmox-homelab-api/internal/app/proxmox-homelab-api/model"
+)
+
+func ServiceProbes(services []config.Service, data *model.Response) {
+	for {
+
+		// Prepare async probes
+		asyncProbes := make([]asyncProbe, 0)
+		for _, service := range services {
+			name := service.Name
+			host := service.Host
+			asyncProbes = append(asyncProbes, createAsyncProbes(name, host, service.Probes)...)
+		}
+
+		// Run async probes
+		probeResult := runProbers(asyncProbes)
+
+		// Update data
+		data.Services = make([]model.Service, len(services))
+
+		for index, service := range services {
+			serviceStatus := model.Service{
+				Name: service.Name,
+				Node: service.Node,
+			}
+			if probeResult[service.Name] == len(service.Probes) {
+				serviceStatus.Status = "ok"
+			} else {
+				serviceStatus.Status = "error"
+			}
+
+			data.Services[index] = serviceStatus
+		}
+
+		// TODO: make this configurable
+		time.Sleep(5 * time.Second)
+	}
+}

@@ -1,0 +1,14 @@
+{
+    "services": [
+        {
+            "name": "hello",
+            "node": "nuc1",
+            "status": "online"
+        }
+    ],
+    "nodes": {
+        "nuc1": {
+            "status": "online"
+        }
+    }
+}
