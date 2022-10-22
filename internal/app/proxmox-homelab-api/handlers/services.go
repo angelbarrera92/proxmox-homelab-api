@@ -53,8 +53,7 @@ func (p ProxmoxHomelabApi) manageService(a ACTION, w http.ResponseWriter, r *htt
 			// Check if the array of services in data contains the service requested
 			for _, ds := range p.Data.Services {
 				if ds.Name == service {
-					// Check if the service is already running
-					if ds.Status == "error" {
+					if err := checkServiceStatusForAction(a, ds.Status); err != nil {
 						w.WriteHeader(http.StatusConflict)
 						return
 					}
@@ -114,6 +113,21 @@ func (p ProxmoxHomelabApi) manageService(a ACTION, w http.ResponseWriter, r *htt
 	}
 }
 
+func checkServiceStatusForAction(a ACTION, s string) (err error) {
+	switch a {
+	case STOP:
+		if s != "ok" {
+			return fmt.Errorf("service is not running")
+		}
+	case START:
+		if s != "error" {
+			return fmt.Errorf("service is already running")
+		}
+	}
+
+	return nil
+}
+
 func checkNodeStatusForAction(a ACTION, s string) (err error) {
 	switch a {
 	case STOP:
@@ -121,8 +135,8 @@ func checkNodeStatusForAction(a ACTION, s string) (err error) {
 			return fmt.Errorf("node is not running")
 		}
 	case START:
-		if s != "error" {
-			return fmt.Errorf("node is already running")
+		if s != "ok" {
+			return fmt.Errorf("node is not running")
 		}
 	}
 
