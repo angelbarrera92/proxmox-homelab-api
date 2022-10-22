@@ -1,5 +1,5 @@
-github.com/angelbarrera92/proxmox-api-go v0.0.0-20221014150916-a37ad72fe1b0 h1:QZiOD5qdsahlkfWmYlGcYeW9iczVmwVQe2kmzEHfMo4=
-github.com/angelbarrera92/proxmox-api-go v0.0.0-20221014150916-a37ad72fe1b0/go.mod h1:zQ/B1nkMv6ueUlAEr0D/x5eaFe3rHSScuTc08dcvvPI=
+github.com/Telmate/proxmox-api-go v0.0.0-20221020134619-82d6490ad228 h1:VVvOx0sqTJgFlYrCoti15Z8U8k5g9K8fol+DdJmZL7g=
+github.com/Telmate/proxmox-api-go v0.0.0-20221020134619-82d6490ad228/go.mod h1:zQ/B1nkMv6ueUlAEr0D/x5eaFe3rHSScuTc08dcvvPI=
 github.com/coreos/bbolt v1.3.1-coreos.6.0.20180223184059-4f5275f4ebbf/go.mod h1:iRUV2dpdMOn7Bo10OQBFzIJO9kkE559Wcmn+qkEiiKk=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
