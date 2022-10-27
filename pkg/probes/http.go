@@ -8,16 +8,17 @@ import (
 )
 
 type HTTPProber struct {
-	Schema         string
-	Host           string
-	Port           int
-	Path           string
-	ExpectedStatus int
+	Schema             string
+	Host               string
+	Port               int
+	Path               string
+	ExpectedStatus     int
+	InsecureSkipVerify bool
 }
 
 func (p HTTPProber) Probe() (bool, error) {
 	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: p.InsecureSkipVerify}, // nolint:gosec
 	}
 	client := &http.Client{
 		Transport: tr,

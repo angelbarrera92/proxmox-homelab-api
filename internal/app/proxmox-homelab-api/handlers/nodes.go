@@ -10,25 +10,11 @@ import (
 )
 
 // StartNode starts a node: POST /nodes/{node}/start
-func (p ProxmoxHomelabApi) StartNode(w http.ResponseWriter, r *http.Request) {
-	// Check method, only POST is allowed
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
+// nolint:typecheck
+func (p ProxmoxHomelabAPI) StartNode(w http.ResponseWriter, r *http.Request) {
 
+	p.node(w, r)
 	node := mux.Vars(r)["node"]
-
-	// Check user submitted the node
-	if node == "" {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	if _, ok := p.Data.Nodes[node]; !ok {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
 
 	// Check if node is already running
 	if p.Data.Nodes[node].Status == "ok" {
@@ -47,24 +33,8 @@ func (p ProxmoxHomelabApi) StartNode(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (p ProxmoxHomelabApi) startNode(node string) error {
-	log.Printf("Starting node %s", node)
-	for _, n := range p.Config.Nodes {
-		if n.Name == node {
-			log.Printf("Sending magic packet to %s", n.Mac)
-			err := wol.SendMagicPacket(n.Mac, n.Wol.Broadcast)
-			if err != nil {
-				log.Printf("Error starting node %s: %v", node, err)
-				return err
-			}
-			break
-		}
-	}
-	return nil
-}
-
-// StartNode shutdown a node: POST /nodes/{node}/stop
-func (p ProxmoxHomelabApi) StopNode(w http.ResponseWriter, r *http.Request) {
+// nolint:typecheck
+func (p ProxmoxHomelabAPI) node(w http.ResponseWriter, r *http.Request) {
 	// Check method, only POST is allowed
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
@@ -83,6 +53,31 @@ func (p ProxmoxHomelabApi) StopNode(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
+}
+
+// nolint:typecheck
+func (p ProxmoxHomelabAPI) startNode(node string) error {
+	log.Printf("Starting node %s", node)
+	for _, n := range p.Config.Nodes {
+		if n.Name == node {
+			log.Printf("Sending magic packet to %s", n.Mac)
+			err := wol.SendMagicPacket(n.Mac, n.Wol.Broadcast)
+			if err != nil {
+				log.Printf("Error starting node %s: %v", node, err)
+				return err
+			}
+			break
+		}
+	}
+	return nil
+}
+
+// StopNode shutdown a node: POST /nodes/{node}/stop
+// nolint:typecheck
+func (p ProxmoxHomelabAPI) StopNode(w http.ResponseWriter, r *http.Request) {
+
+	p.node(w, r)
+	node := mux.Vars(r)["node"]
 
 	// Check if node is already running
 	if p.Data.Nodes[node].Status != "ok" {
@@ -99,7 +94,8 @@ func (p ProxmoxHomelabApi) StopNode(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (p ProxmoxHomelabApi) stopNode(node string) error {
+// nolint:typecheck
+func (p ProxmoxHomelabAPI) stopNode(node string) error {
 	log.Printf("Stopping node %s", node)
 	for _, n := range p.Config.Nodes {
 		if n.Name == node {

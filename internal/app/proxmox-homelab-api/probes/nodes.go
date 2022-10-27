@@ -11,15 +11,15 @@ func NodeProbes(nodes []config.Node, data *model.Response) {
 	for {
 
 		// Prepare async probes
-		asyncProbes := make([]asyncProbe, 0)
+		asyncProbes := make([]asyncProbe, 0) // nolint:typecheck
 		for _, node := range nodes {
 			name := node.Name
 			host := node.Host
-			asyncProbes = append(asyncProbes, createAsyncProbes(name, host, node.Probes)...)
+			asyncProbes = append(asyncProbes, createAsyncProbes(name, host, node.Probes)...) // nolint:typecheck
 		}
 
 		// Run async probes
-		probeResult := runProbers(asyncProbes)
+		probeResult := runProbers(asyncProbes) // nolint:typecheck
 
 		// Update data
 		data.Nodes = model.Nodes{}

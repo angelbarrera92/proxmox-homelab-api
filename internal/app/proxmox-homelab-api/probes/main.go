@@ -33,11 +33,12 @@ func createAsyncProbes(name, host string, hostProbes []config.Probe) (asyncProbe
 			}
 		} else if probe.Type == "http" {
 			prober = probes.HTTPProber{
-				Schema:         probe.Schema,
-				Host:           host,
-				Port:           probe.Port,
-				Path:           probe.Path,
-				ExpectedStatus: probe.ExpectedStatus,
+				Schema:             probe.Schema,
+				Host:               host,
+				Port:               probe.Port,
+				Path:               probe.Path,
+				ExpectedStatus:     probe.ExpectedStatus,
+				InsecureSkipVerify: probe.InsecureSkipVerify,
 			}
 		}
 
@@ -87,7 +88,7 @@ func runProbers(asyncProbes []asyncProbe) probeResults {
 			log.Printf("error probing %s: %s", result.Name, result.Error)
 		}
 		if result.Result {
-			pr[result.Name] += 1
+			pr[result.Name]++
 		}
 	}
 
