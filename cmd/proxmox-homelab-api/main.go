@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/angelbarrera92/proxmox-homelab-api/internal/app/proxmox-homelab-api/config"
 	"github.com/angelbarrera92/proxmox-homelab-api/internal/app/proxmox-homelab-api/handlers"
@@ -13,15 +15,56 @@ import (
 )
 
 var (
-	proxmoxApiHandler handlers.ProxmoxHomelabApi
+	proxmoxAPIHandler handlers.ProxmoxHomelabAPI
 	data              model.Response
 	logLevel          string
+	version           = "dev"
+	commit            = "none"
+	date              = "unknown"
 )
+
+func printHelp() {
+	fmt.Println("Usage: proxmox-homelab-api [options]")
+	fmt.Println("Options:")
+	fmt.Println("  -h, --help\t\tPrint this help")
+	fmt.Println("  -c, --config\t\tPath to config file")
+	fmt.Println("  -v, --version\t\tPrint version information")
+}
 
 func main() {
 
+	// Print help if no arguments are provided
+	if len(os.Args) == 1 {
+		printHelp()
+		os.Exit(0)
+	}
+
+	// Parse arguments
+	var configPath string
+	for i := 1; i < len(os.Args); i++ {
+		switch os.Args[i] {
+		case "-h", "--help":
+			printHelp()
+			os.Exit(0)
+		case "-v", "--version":
+			fmt.Printf("proxmox-homelab-api %s, commit %s, built at %s\n", version, commit, date)
+			os.Exit(0)
+		case "-c", "--config":
+			if i+1 < len(os.Args) {
+				configPath = os.Args[i+1]
+				i++
+			} else {
+				fmt.Println("Error: -c or --config requires a path to a config file")
+				os.Exit(1)
+			}
+		default:
+			fmt.Printf("Error: unknown argument %s\n", os.Args[i])
+			os.Exit(1)
+		}
+	}
+
 	// Load config
-	cfg, err := config.Parse("/home/angel/personal/proxmox-homelab-api/configs/demo.yaml")
+	cfg, err := config.Parse(configPath)
 	if err != nil {
 		log.Fatalf("error parsing config: %v", err)
 	}
@@ -30,7 +73,7 @@ func main() {
 	data = initResponse(*cfg)
 
 	// Init handlers
-	proxmoxApiHandler = handlers.ProxmoxHomelabApi{
+	proxmoxAPIHandler = handlers.ProxmoxHomelabAPI{
 		Data:   &data,
 		Config: *cfg,
 	}
@@ -46,16 +89,25 @@ func main() {
 
 	// Create router
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/services", proxmoxApiHandler.Services)
-	router.HandleFunc("/services/{service}/start", proxmoxApiHandler.StartService)
-	router.HandleFunc("/services/{service}/stop", proxmoxApiHandler.StopService)
-	router.HandleFunc("/nodes/{node}/start", proxmoxApiHandler.StartNode)
-	router.HandleFunc("/nodes/{node}/stop", proxmoxApiHandler.StopNode)
+	router.HandleFunc("/services", proxmoxAPIHandler.Services)
+	router.HandleFunc("/services/{service}/start", proxmoxAPIHandler.StartService)
+	router.HandleFunc("/services/{service}/stop", proxmoxAPIHandler.StopService)
+	router.HandleFunc("/nodes/{node}/start", proxmoxAPIHandler.StartNode)
+	router.HandleFunc("/nodes/{node}/stop", proxmoxAPIHandler.StopNode)
 
 	// Start server
 	addr := fmt.Sprintf("%s:%d", cfg.Host, cfg.Port)
+	server := &http.Server{
+		Addr:              addr,
+		ReadHeaderTimeout: 3 * time.Second,
+		Handler:           router,
+	}
+
 	log.Println("Starting server at", addr)
-	log.Fatal(http.ListenAndServe(addr, router))
+	err = server.ListenAndServe()
+	if err != nil {
+		log.Fatalf("error starting server: %v", err)
+	}
 }
 
 func initResponse(cfg config.Config) (d model.Response) {

@@ -18,17 +18,17 @@ type ClientConfig struct {
 }
 
 func NewClient(config ClientConfig) (*proxmox.Client, error) {
-	proxmoxApiURL := fmt.Sprintf("%s://%s:%d/api2/json", config.Schema, config.Host, config.Port)
+	proxmoxAPIURL := fmt.Sprintf("%s://%s:%d/api2/json", config.Schema, config.Host, config.Port)
 	insecure := !config.VerifySSL
 	proxyString := ""
 	httpHeaders := ""
 	taskTimeout := 300
-	tlsConf := &tls.Config{InsecureSkipVerify: !config.VerifySSL}
+	tlsConf := &tls.Config{InsecureSkipVerify: !config.VerifySSL} // nolint:gosec
 	if !insecure {
 		tlsConf = nil
 	}
 
-	c, err := proxmox.NewClient(proxmoxApiURL, nil, httpHeaders, tlsConf, proxyString, taskTimeout)
+	c, err := proxmox.NewClient(proxmoxAPIURL, nil, httpHeaders, tlsConf, proxyString, taskTimeout)
 	if err != nil {
 		log.Fatalf("error creating proxmox client: %s", err)
 		return nil, err

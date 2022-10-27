@@ -18,21 +18,25 @@ const (
 )
 
 // Endpoint to get the status of all services
-func (p ProxmoxHomelabApi) Services(w http.ResponseWriter, r *http.Request) {
+// nolint:typecheck
+func (p ProxmoxHomelabAPI) Services(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p.Data)
 }
 
-func (p ProxmoxHomelabApi) StartService(w http.ResponseWriter, r *http.Request) {
+// nolint:typecheck
+func (p ProxmoxHomelabAPI) StartService(w http.ResponseWriter, r *http.Request) {
 	p.manageService(START, w, r)
 }
 
-func (p ProxmoxHomelabApi) StopService(w http.ResponseWriter, r *http.Request) {
+// nolint:typecheck
+func (p ProxmoxHomelabAPI) StopService(w http.ResponseWriter, r *http.Request) {
 	p.manageService(STOP, w, r)
 }
 
-func (p ProxmoxHomelabApi) manageService(a ACTION, w http.ResponseWriter, r *http.Request) {
+// nolint:typecheck
+func (p ProxmoxHomelabAPI) manageService(a ACTION, w http.ResponseWriter, r *http.Request) {
 	// Check method, only POST is allowed
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)

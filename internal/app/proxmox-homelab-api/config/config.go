@@ -19,11 +19,12 @@ type Wol struct {
 }
 
 type Probe struct {
-	Type           string `yaml:"type"`
-	Port           int    `yaml:"port"`
-	Schema         string `yaml:"schema,omitempty"`
-	Path           string `yaml:"path,omitempty"`
-	ExpectedStatus int    `yaml:"expected_status,omitempty"`
+	Type               string `yaml:"type"`
+	Port               int    `yaml:"port"`
+	Schema             string `yaml:"schema,omitempty"`
+	Path               string `yaml:"path,omitempty"`
+	ExpectedStatus     int    `yaml:"expected_status,omitempty"`
+	InsecureSkipVerify bool   `yaml:"insecure_skip_verify,omitempty"`
 }
 
 type Node struct {
