@@ -17,7 +17,11 @@ type ClientConfig struct {
 	VerifySSL bool
 }
 
-func NewClient(config ClientConfig) (*proxmox.Client, error) {
+type Client struct {
+	c *proxmox.Client
+}
+
+func NewClient(config ClientConfig) (*Client, error) {
 	proxmoxAPIURL := fmt.Sprintf("%s://%s:%d/api2/json", config.Schema, config.Host, config.Port)
 	insecure := !config.VerifySSL
 	proxyString := ""
@@ -40,5 +44,21 @@ func NewClient(config ClientConfig) (*proxmox.Client, error) {
 		return nil, err
 	}
 
-	return c, nil
+	return &Client{c: c}, nil
+}
+
+func (c *Client) ShutdownNode(node string) (string, error) {
+	return c.c.ShutdownNode(node)
+}
+
+func (c *Client) GetVMRefByName(vmName string) (*proxmox.VmRef, error) {
+	return c.c.GetVmRefByName(vmName)
+}
+
+func (c *Client) ShutdownVM(vmr *proxmox.VmRef) (string, error) {
+	return c.c.ShutdownVm(vmr)
+}
+
+func (c *Client) StartVM(vmr *proxmox.VmRef) (string, error) {
+	return c.c.StartVm(vmr)
 }

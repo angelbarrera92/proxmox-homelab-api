@@ -48,6 +48,7 @@ type Proxmox struct {
 type Service struct {
 	Name        string  `yaml:"name"`
 	Description string  `yaml:"description"`
+	Icon        string  `yaml:"icon"`
 	Node        string  `yaml:"node"`
 	Host        string  `yaml:"host"`
 	Port        int     `yaml:"port"`

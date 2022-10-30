@@ -1,6 +1,7 @@
 package probes
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/angelbarrera92/proxmox-homelab-api/internal/app/proxmox-homelab-api/config"
@@ -24,7 +25,11 @@ func NodeProbes(nodes []config.Node, data *model.Response) {
 		// Update data
 		data.Nodes = model.Nodes{}
 		for _, node := range nodes {
-			var nodeStatus model.NodeStatus
+			nodeStatus := model.NodeStatus{
+				Description: node.Description,
+				EndPoint:    fmt.Sprintf("%s://%s:%d", node.Proxmox.Schema, node.Host, node.Proxmox.Port),
+				Probes:      len(node.Probes),
+			}
 			if probeResult[node.Name] == len(node.Probes) {
 				nodeStatus.Status = "ok"
 			} else {

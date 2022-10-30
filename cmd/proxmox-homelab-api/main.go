@@ -118,15 +118,22 @@ func initResponse(cfg config.Config) (d model.Response) {
 
 	for _, node := range cfg.Nodes {
 		d.Nodes[node.Name] = model.NodeStatus{
-			Status: "unknown",
+			Description: node.Description,
+			EndPoint:    fmt.Sprintf("%s://%s:%d", node.Proxmox.Schema, node.Host, node.Proxmox.Port),
+			Status:      "unknown",
+			Probes:      len(node.Probes),
 		}
 	}
 
 	for _, service := range cfg.Services {
 		d.Services = append(d.Services, model.Service{
-			Name:   service.Name,
-			Node:   service.Node,
-			Status: "unknown",
+			Name:        service.Name,
+			Description: service.Description,
+			Icon:        service.Icon,
+			Node:        service.Node,
+			Status:      "unknown",
+			Probes:      len(service.Probes),
+			EndPoint:    fmt.Sprintf("%s://%s:%d", service.Schema, service.Host, service.Port),
 		})
 	}
 

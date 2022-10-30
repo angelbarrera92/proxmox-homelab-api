@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	telmateproxmox "github.com/Telmate/proxmox-api-go/proxmox"
 	"github.com/angelbarrera92/proxmox-homelab-api/internal/app/proxmox-homelab-api/proxmox"
 	"github.com/gorilla/mux"
 )
@@ -98,13 +97,7 @@ func (p ProxmoxHomelabAPI) manageService(a ACTION, w http.ResponseWriter, r *htt
 						return
 					}
 
-					vmRef, err := c.GetVmRefByName(s.Name)
-					if err != nil {
-						w.WriteHeader(http.StatusInternalServerError)
-						return
-					}
-
-					err = shutdownOrStartVM(a, c, vmRef)
+					err = shutdownOrStartVM(s.Name, a, c)
 					if err != nil {
 						w.WriteHeader(http.StatusInternalServerError)
 						return
@@ -147,13 +140,18 @@ func checkNodeStatusForAction(a ACTION, s string) (err error) {
 	return nil
 }
 
-func shutdownOrStartVM(a ACTION, c *telmateproxmox.Client, vm *telmateproxmox.VmRef) (err error) {
+func shutdownOrStartVM(vmName string, a ACTION, c *proxmox.Client) (err error) {
+	vmRef, err := c.GetVMRefByName(vmName)
+	if err != nil {
+		return err
+	}
+
 	switch a {
 	case STOP:
-		_, err = c.ShutdownVm(vm)
+		_, err = c.ShutdownVM(vmRef)
 		return
 	case START:
-		_, err = c.StartVm(vm)
+		_, err = c.StartVM(vmRef)
 		return
 	}
 
